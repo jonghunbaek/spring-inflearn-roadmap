@@ -57,3 +57,30 @@
 + 반복 - th:each="user : ${users}" // th:each="user, userStat : ${users}" 두 번째 파라미터 userStat을 통해 반복의 상태 등 여러 가지 정보를 확인 가능
 + 조건 - th:if // th:unless -> 조건에 맞지 않으면 태그 자체가 날라가는 것 주의
 + 주석 - html주석(<!-- -->) , 타입리프 파서 주석(<!--/* */--!>) - 렌더링 자체가 안됨, 타임리프 프로토타입 주석(<!--/*/ /*/-->) - 타임리프로 렌더링 된 경우에만 주석처리x
++ 블록 - 일반적을 each 태그로 해결하기 어려운 경우에 사용
++ 자바스크립트 인라인 - <script th:inline="javascript"> -> script태그 안에서 타임리프 표현식사용을 편리하게 만들어줌, 객체를 json형태로 보내줌
+```javasript
+  var username2 = /*[[${user.username}]]*/ "test username"; // 인라인 사용시 주석처리 된 부분이 렌더링됨
+// each를 통해 이런것도 가능.. 개쩐다..
+<script th:inline="javascript">
+    [# th:each="user, stat : ${users}"]
+    var user[[${stat.count}]] = [[${user}]];
+    [/]
+</script>
+```
++ 템플릿 조각 - 공통영역(네비바, 푸터 등)을 조각으로 만들어 코드의 재사용을 가능하게 만든다.
+```html
+<h1>부분 포함</h1>
+<h2>부분 포함 insert</h2> // 태그 안에
+<div th:insert="~{template/fragment/footer :: copy}"></div>
+
+<h2>부분 포함 replace</h2> // 태그 자체 교체
+<div th:replace="~{template/fragment/footer :: copy}"></div>
+
+<h2>부분 포함 단순 표현식</h2>
+<div th:replace="template/fragment/footer :: copy"></div>
+
+<h1>파라미터 사용</h1>
+<div th:replace="~{template/fragment/footer :: copyParam ('데이터1', '데이터2')}"></div>
+```
++ 템플릿 레이아웃 - 사용법은 템플릿 조각과 같으나 조각은 태그 교체정도지만 레이아웃은 틀(레이아웃)을 바꾸는 것
