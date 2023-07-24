@@ -43,8 +43,14 @@ public FieldError(String objectName, String field, String defaultMessage) {
 ### 오류코드와 메시지 처리
 + FieldError의 codes, arguments 필드 값에 메시지소스를 활용해 값을 넣어 줄 수 있다.
 + rejectValue(필드), reject(글로벌)을 활용해 코드를 간소화 할 수 있다. 오류코드를 입력해주는데 이 오류코드는 errors.properties에 있는 에러코드의 앞 단어만 딴 것이고 이건 messageResolver를 위한 오류 코드이다.
-
-
++ MessageCodesResolver의 동작 방식 - 검증 오류코드(여기선 "required)로 메시지 코드들을 찾아줌
++ rejectValue(), reject()는 내부적으로 MessageCodesResolver를 사용, FieldError, ObjectError의 생성자 매개 변수로 오류코드 배열을 받을 수 있다.
++ 기본 메시지 생성 규칙 - 객체오류(코드명.objectName -> 코드명), 필드오류(코드명.objectName.field -> 코드명.field -> 코드명.fieldType -> 코드명)
++ 즉 MessageCodesResolver는 구체적인 것에서 덜 구체적인 것으로 메시지 코드를 만든다. 이를 통해 프로덕션 코드를 건들지 않고 properties에서 메시지만 교체할 수 있다.
++ 위 과정은 ValidationUtils로 간편하게 사용할 수 있다. 단, 공백이나 빈 값 같은 단순한 경우에만 적용 가능
++ Validator 활용 - Validator인터페이스를 구현하고 supports()와 validate()를 오버라이딩하여 사용한다.
++ @InitBinder - Controller가 호출 될 때마다 실행, WebDataBinder로 검증기를 넣어 사용
+  
 ### TIP
 + 부정의 부정으로 코딩하는 것은 지양
 + errors?.containsKey -> errors다음에 '?' errors가 null또는 객체가 없을 때도 널포인트 익셉션을 던지지 않음
