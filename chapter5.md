@@ -34,3 +34,5 @@ public String addItem2(@Validated(SaveCheck.class) @ModelAttribute Item item, Bi
   ...
 }
 + 두번째 방법(Dto를 사용 - 도메인 객체와 폼 전송 데이터가 딱 맞지 않기 때문이다.)
++ JSON으로 주고 받을 때 - 성공요청, 실패요청(JSON을 객체로 생성하는 것 자체가 실패 ex) 데이터 파싱), 검증 오류 요청(JSON을 객체로 생성하는 것은 성공, 검증 실패)
++ @ModelAttribute는 필드 중 하나가 타입에 맞지 않아도 나머지 필드는 정상처리, JSON은 전체 객체 단위로 적용돼서 메시지 컨버터 이후 진행X, 전체가 실패
