@@ -11,3 +11,71 @@
 
 ### 세션을 활용한 로그인 처리
 + 세션(uuid를 활용해 sessionId 생성)을 사용해 앞서 말한 대안을 처리 - 즉, 서버와 클라이언트는 sessionId라는 랜덤한 토큰 값으로 통신을 하게 된다.
++ 세션 직접 만들기(생성, 조회, 만료)
+``` java
+@Component
+public class SessionManager {
+
+    public static final String SESSION_COOKIE_NAME = "mySessionId";
+    private Map<String, Object> sessionStore = new ConcurrentHashMap<>();
+
+    /**
+     *  세션 생성
+     *  sessionId 생성(임의의 추정 불가능한 랜덤 값)
+     *  세션 저장소에 sessionId와 보관할 값 저장
+     *  sessionId로 응답 쿠키를 생성해 클라이언트에 전달
+     */
+    public void createSession(Object value, HttpServletResponse response) {
+        // id 생성 후 저장
+        String sessionId = UUID.randomUUID().toString();
+        sessionStore.put(sessionId, value);
+
+        // 쿠키 생성
+        Cookie mySessionCookie = new Cookie(SESSION_COOKIE_NAME, sessionId);
+        response.addCookie(mySessionCookie);
+    }
+
+    /**
+     * 세션 조회
+     */
+    public Object getSession(HttpServletRequest request) {
+        Cookie sessionCookie = findCookie(request, SESSION_COOKIE_NAME);
+        if (sessionCookie == null) {
+            return null;
+        }
+        return  sessionStore.get(sessionCookie.getValue());
+    }
+
+    /**
+     * 세션 만료
+     * @param request
+     */
+    public void  expire(HttpServletRequest request) {
+        Cookie sessionCookie = findCookie(request, SESSION_COOKIE_NAME);
+        if (sessionCookie != null) {
+            sessionStore.remove(sessionCookie.getValue());
+        }
+    }
+
+    private Cookie findCookie(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        return Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .findAny()
+                .orElse(null);
+    }
+}
+
+```
+
+
+### Servlet 세션을 활용한 로그인 처리
++ request.getSession(true) - 세션이 있으면 반환, 없으면 새로 생성 // request.getSession(false) - 세션이 있으면 반환, 없으면 null
+```java
+  public String homeLoginV3Spring(
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
+```
++ 위와 같은 코드를 활용해 세션을 간편하게 관리 할 수 있다.
