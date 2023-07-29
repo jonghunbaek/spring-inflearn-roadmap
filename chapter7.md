@@ -166,6 +166,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 ### 서블릿 필터 & 스프링 인터셉터
 + 필터와 인터셉터는 웹과 관련된 공통 관심사를 해결하기 위한 기술이다.
 + 필터보단 인터셉터가 확실히 편리. 무조건 필터를 사용해야되는 상황이 아니라면 인터셉터를 사용하자.
++ 필터, 인터셉터 모두 WebConfig에서 new예약어로 생성할 수도 있고 @Component 등록해서 빈으로 등록하여 의존성주입을 통해 사용할 수도 있다.
   
 
 ### Tip
