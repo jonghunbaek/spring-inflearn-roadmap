@@ -73,9 +73,21 @@ public class SessionManager {
 
 
 ### Servlet 세션을 활용한 로그인 처리
++ HttpSession을 활용해 사
 + request.getSession(true) - 세션이 있으면 반환, 없으면 새로 생성 // request.getSession(false) - 세션이 있으면 반환, 없으면 null
 ```java
   public String homeLoginV3Spring(
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
 ```
 + 위와 같은 코드를 활용해 세션을 간편하게 관리 할 수 있다.
++ getMaxInactiveInterval(세션 유효시간), creationTime(세션 생성일시), lastAccessedTime(가장 최근 서버에 접근시간, 클라이언트에서 서버로), isNew(새로 생성된 세션인지)
++ 세션의 종료시점 - 사용자가 서버에 가장 최근에 요청한 시간을 기준으로 30분정도 유지하는게 베스트이고 이 방식을 HttpSession에서 사용한다.
+```java
+#application.properties
+server.servlet.session.timeout=1800
+```
+위 코드를 통해 세션의 타임아웃을 글로벌로 설정할 수 있다.
++ 세션 타임아웃은 LastAccessedTime이후로 timeout시간이 지나면, WAS가 내부에서 해당 세션을 제거한다.
+
+### Tip
++ session은 메모리를 활용한다. -> 꼭 필요한 경우에만 생성
