@@ -14,3 +14,52 @@
 + sendError호출이 있으면 WAS는 오류페이지 정보를 확인해 반환한다. 즉, 위의 sendError의 흐름을 다시 역으로 진행(WAS는 오류페이지 출력을 위해 /error-page/500을 다시 요청)
 + 쉽게 말해 Controller가 2번 요청 되고 이 때문에 클라이언트는 이런 상황을 전혀 알 수 없다.
 + WAS가 오류페이지를 재요청할 때 request에 attribute를 추가해서 넘겨주기 때문에 오류페이지에서 전달된 오류정보를 활용할 수 있다.
++ 오류 발생 시 WAS 내부에서 재호출이 일어나며 필터와 인터셉터를 한번 더 거치게 된다. 이는 비효율적이므로 요청을 구분하기 위해 DispatcherType이라는 추가 정보를 서블릿에서 제공한다.
++ DispatcherType - REQUEST, ERROR, FORWARD, INCLUDE, ASYNC
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Bean
+    public FilterRegistrationBean logFilter() {
+        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new LogFilter());
+        filterRegistrationBean.setOrder(1);
+        filterRegistrationBean.addUrlPatterns("/*");
+        filterRegistrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ERROR);
+        return filterRegistrationBean;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "*.ico", "/error", "/error-page/**");
+    }
+}
+```
+
+### 스프링 부트 - 오류 페이지
++ 뷰 템플릿 - 정적 리소스(static, pulic) - static/templates/error.html 순으로 에러페이지를 찾는다. 또 구체적인 파일명이 우선순위가 높다.
++ BasicErrorController -> 동적으로 에러페이지를 표현하고 싶을 때 유리, 아래와 같이 정보를 가져올 수 있다.
+```html
+<ul>
+      <li th:text="|timestamp: ${timestamp}|"></li>
+      <li th:text="|path: ${path}|"></li>
+      <li th:text="|status: ${status}|"></li>
+      <li th:text="|message: ${message}|"></li>
+      <li th:text="|error: ${error}|"></li>
+      <li th:text="|exception: ${exception}|"></li>
+      <li th:text="|errors: ${errors}|"></li>
+      <li th:text="|trace: ${trace}|"></li>
+    </ul>
+```
++ 아래와 같이 properties의 설정을 통해 에러메시지 등의 노출여부를 설정할 수 있다.
+```
+server.error.include-exception=true
+server.error.include-message=always
+server.error.include-stacktrace=on_param
+server.error.include-binding-errors=on_param
+```
++ 에러 처리 컨트롤러를 커스텀하고 싶으면 BasicErrorController 또는 ErrorController를 상속받아 해결(ErrorController는 현재 안쓰는 듯)
