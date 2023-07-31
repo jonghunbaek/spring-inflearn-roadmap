@@ -33,7 +33,11 @@ public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resol
 ```
 + 발생한 오류가 형변환이 되는지 확인하고 된다면 예외를 처리해 정상적으로 동작하는 것처럼 만드는 것이 목적이다.
 + 비어있는 ModelAndView를 반환하면 뷰를 렌더링하지 않고 정상흐름으로 서블릿이 반환된다. 지정해서 반환하면 뷰를 렌더링한다. null인 경우엔 다음 ExceptionResolver를 찾아서 반환하고 없음녀 기존에 발생한 예외를 서블릿 밖으로 던지는데 이는 예외를 처리 못하게 되는 것이다.
++ ExceptionResolver를 적용하면 예외가 서블릿 컨테이너까지 전달되지 않고 스프링 mvc내에서 다 처리가 된다는 것이 포인트다.
 
+### 스프링이 제공하는 ExceptionResolver
++ HandlerExceptionResolverComposite 등록 순서 - ExceptionHandlerExceptionResolver -> ResponseStatusExceptionResolver -> DefaultHandlerExceptionResolver
++ ExceptionHandlerExceptionResolver(대부분의 api 예외처리), ResponseStatusExceptionResolver(@ResponseStatus(value = HttpStatus.NOT_FOUND), DefaultHandlerExceptionResolver(기본예외 처리)
 + 
 
 ### Tip
