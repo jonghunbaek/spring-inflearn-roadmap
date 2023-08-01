@@ -9,4 +9,22 @@ public interface Converter<S, T> {
 	T convert(S source);
 ```
 + 개별로 구현하기에 불편함이 존재. 컨버전 서비스를 통해 해결
-+ 
+
+### 스프링에서 제공하는 ConversionService
++ 컨버전 서비스는 등록할 때만 명확히 알면 사용할 때는 어떤 메서드를 사용할 지 몰라도 된다.
++ DefaultConversionService는 ConversionService와 ConversionRegistry를 상속 받는데, 전자는 컨버터의 사용에 후자는 컨버터의 등록에 특화된 기능을 가지고 있다.
++ 이렇게 인터페이스 관심사를 분리함으로써 추후 등록 방법 변경에도 컨버터 사용에는 영향이 없고 클라이언트는 꼭 필요한 메서드만 알게 된다. 이는 객체지향 5원칙 중 하나인 ISP(Interface Segregation Principal)이다.
++ 스프링에서 지원하는 컨버전 서비스는 아래와 같이 구현할 수 있다.
+```java
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new IntegerToStringConverter());
+        registry.addConverter(new StringToIpPortConverter());
+        registry.addConverter(new StringToIntegerConverter());
+        registry.addConverter(new IpPortToStringConverter());
+    }
+}
+```
++ 컨버터를 추가 등록하면 기본 컨버터보다 우선순위로 실행된다.
