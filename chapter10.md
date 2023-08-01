@@ -28,3 +28,12 @@ public class WebConfig implements WebMvcConfigurer {
 }
 ```
 + 컨버터를 추가 등록하면 기본 컨버터보다 우선순위로 실행된다.
++ ${{number}} -> 뷰템플릿은 데이터를 문자로 출력.
++ th:field 컨버전 서비스를 적용한다.
+
+### Formatter
++ Formatter를 상속받아 구현
++ Formatter를 FormatterConversionService에 등록해서 사용하자 - DefaultFormattingConversionService로 구현 가능
++ 하지만 스프링 부트에선 WebConversionService를 내부에서 지원
++ 스프링 기본 지원 포맷터 - 기본 형식 지정으로 필드마다 다른 형식 지정이 어려움
++ 애노테이션으로 원하는 형식을 사용할 수 있도록 지원 - @NumberFormta(pattern = ~~), @DateTimeFormat
