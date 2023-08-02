@@ -30,6 +30,19 @@ public class WebConfig implements WebMvcConfigurer {
 + 컨버터를 추가 등록하면 기본 컨버터보다 우선순위로 실행된다.
 + ${{number}} -> 뷰템플릿은 데이터를 문자로 출력.
 + th:field 컨버전 서비스를 적용한다.
++ 아래와 같이 어노테이션을 활용해 포맷팅을 할 수 있다.
+```java
+static class Form {
+        @NumberFormat(pattern = "###,###")
+        private Integer number;
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime localDateTime;
+}
+```
+
+### 주의사항
++ HttpMessageConverter는 컨버전 서비스가 적용되지 않는다.(jackson에서 지원하 포매팅을 써야 한다.)
 
 ### Formatter
 + Formatter를 상속받아 구현
