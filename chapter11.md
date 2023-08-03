@@ -62,7 +62,29 @@
         return "upload-form";
     }
 ```
-+
++ UrlResource에 "file:"을 넣어주면 내부 파일에 접근할 수 있다.
 
 ### Tip
 + 바이너리 -> 문자 변환할 때는 항상 인코딩 방식을 정해줘야 한다.(UTF-8처럼)
++ 파일 다운로드는 아래와 같이 하면 된다.
+```java
+@GetMapping("/attach/{itemId}")
+    public ResponseEntity<Resource> downloadAttach(@PathVariable Long itemId) throws MalformedURLException {
+        Item item = itemRepository.findById(itemId);
+        String storeFileName = item.getAttachFile().getStoreFileName();
+        String uploadFileName = item.getAttachFile().getUploadFileName();
+
+        UrlResource resource = new UrlResource("file:" + fileStore.getFullPath(storeFileName));
+
+        log.info("uploadFileName={}", uploadFileName);
+
+        // 인코딩 타입을 설정해준다.
+        String encodedUploadFileName = UriUtils.encode(uploadFileName, StandardCharsets.UTF_8);
+        // 다운로드를 위한 규약?같은 것 헤더에 추가해주면 응답할 때 첨부파일임을 인식해 다운로드가 가능하게 해준다.
+        String contentDisposition = "attachment; filename=\"" + encodedUploadFileName + "\"";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .body(resource);
+    }
+```
