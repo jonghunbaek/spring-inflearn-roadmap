@@ -67,6 +67,7 @@
 ### Tip
 + 바이너리 -> 문자 변환할 때는 항상 인코딩 방식을 정해줘야 한다.(UTF-8처럼)
 + 파일 다운로드는 아래와 같이 하면 된다.
++ 
 ```java
 @GetMapping("/attach/{itemId}")
     public ResponseEntity<Resource> downloadAttach(@PathVariable Long itemId) throws MalformedURLException {
